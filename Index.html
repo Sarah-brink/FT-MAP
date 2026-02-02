@@ -9,195 +9,229 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: #1A807D;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: #1A807D;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
 
-    #app {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      position: relative; /* for panel overlay */
-    }
+  #app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
 
-    #toolbar {
-      padding: 10px 14px;
-      background: #334267;
-      color: #ffffff;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      border-bottom: 1px solid #1A807D;
-      z-index: 5;
-    }
+  #toolbar {
+    padding: 10px 14px;
+    background: #334267;
+    color: #ffffff;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid #1A807D;
+    z-index: 5;
+  }
 
-    #toolbar label {
-      font-size: 14px;
-      opacity: 0.85;
-    }
+  #toolbar label {
+    font-size: 14px;
+    opacity: 0.85;
+  }
 
-    #themeSelect {
-      background: #111;
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 6px;
-      padding: 6px 10px;
-      font-size: 14px;
-    }
+  #themeSelect {
+    background: #111;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+  }
 
-    #themeDot {
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      display: inline-block;
-      border: 1px solid rgba(255,255,255,0.35);
-      background: #ffffff;
-    }
+  #themeDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.35);
+    background: #ffffff;
+  }
 
-    #map {
-      flex: 1;
-      background: #1A807D;
-      z-index: 1;
-    }
+  #map {
+    flex: 1;
+    background: #1A807D;
+    z-index: 1;
+  }
 
-    /* Hide Leaflet attribution */
-    .leaflet-control-attribution { display: none; }
+  /* Hide Leaflet attribution */
+  .leaflet-control-attribution { display: none; }
 
-    /* =========================
-       SIDE PANEL (replaces popup)
-       ========================= */
+  /* =========================
+     SIDE PANEL (replaces popup)
+     ========================= */
+  #infoPanel {
+    position: absolute;
+    top: 56px;               /* sits below toolbar */
+    right: 14px;
+    width: 420px;
+    max-width: calc(100vw - 28px);
+    max-height: calc(100vh - 80px);
+    background: rgba(255,255,255,0.96);
+    border-radius: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    overflow: hidden;
+    display: none;           /* hidden until opened */
+    z-index: 10;
+    backdrop-filter: blur(6px);
+  }
+
+  #infoPanelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 14px 12px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.9);
+  }
+
+  #infoPanelTitle {
+    font-weight: 700;
+    font-size: 14px;
+    color: #111;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  #infoPanelMeta {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+
+  #infoPanelBody {
+    padding: 14px;
+    overflow-y: scroll;  /* Always show scrollbar */
+    max-height: 300px;
+  }
+
+  .panel-project {
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #f6f6f6;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .panel-project-title {
+    font-weight: 800;
+    font-size: 14px;
+    margin: 0 0 6px 0;
+    color: #111;
+  }
+
+  .panel-row {
+    font-size: 13px;
+    color: #111;
+    margin: 2px 0;
+  }
+
+  .panel-row strong { font-weight: 700; }
+
+  .theme-chips {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .theme-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.12);
+    font-size: 12px;
+    color: #111;
+    white-space: nowrap;
+  }
+
+  .theme-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.35);
+  }
+
+  .panel-hint {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 6px;
+  }
+
+  /* Scrollable section for extra projects */
+  .scrollable-projects {
+    max-height: 400px; /* Set a max height for the scrollable section */
+    overflow-y: auto; /* Enable scrolling if there are more projects */
+    padding-top: 10px;
+  }
+
+  .project-popup .leaflet-popup-content {
+    margin: 0;
+    width: 420px; /* Caps the width of the popup */
+    max-height: 360px; /* Caps the height of the popup */
+    overflow: auto; /* Manage overflow */
+  }
+
+  .project-popup .popup-header {
+    padding: 14px 14px 10px 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.95);
+  }
+
+  .project-popup .popup-title {
+    font-weight: 800;
+    font-size: 16px;
+    color: #111;
+    line-height: 1.2;
+  }
+
+  .project-popup .popup-meta {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-top: 2px;
+  }
+
+  /* This is the popup body that holds the projects */
+  .project-popup .popup-body {
+    padding: 14px;
+    max-height: 300px;
+    overflow-y: scroll;   /* Always show scrollbar */
+    overflow-x: hidden;
+  }
+
+  .project-popup .scrollable-projects {
+    max-height: 200px;
+    overflow-y: scroll;  /* Always show scrollbar */
+    padding-top: 10px;
+  }
+
+  /* Mobile: turn panel into bottom sheet */
+  @media (max-width: 640px) {
     #infoPanel {
-      position: absolute;
-      top: 56px;               /* sits below toolbar */
+      left: 14px;
       right: 14px;
-      width: 420px;
-      max-width: calc(100vw - 28px);
-      max-height: calc(100vh - 80px);
-      background: rgba(255,255,255,0.96);
-      border-radius: 18px;
-      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
-      overflow: hidden;
-      display: none;           /* hidden until opened */
-      z-index: 10;
-      backdrop-filter: blur(6px);
+      width: auto;
+      top: auto;
+      bottom: 14px;
+      max-height: 55vh;
     }
-
-    #infoPanelHeader {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 14px 12px 14px;
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      background: rgba(255,255,255,0.9);
-    }
-
-    #infoPanelTitle {
-      font-weight: 700;
-      font-size: 14px;
-      color: #111;
-      margin: 0;
-      line-height: 1.2;
-    }
-
-    #infoPanelMeta {
-      font-size: 12px;
-      opacity: 0.75;
-      margin-top: 2px;
-    }
-
-    #closePanelBtn {
-      border: 0;
-      background: rgba(0,0,0,0.06);
-      color: #111;
-      border-radius: 10px;
-      padding: 8px 10px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    #closePanelBtn:hover { background: rgba(0,0,0,0.10); }
-
-    #infoPanelBody {
-      padding: 14px;
-      overflow: auto;
-      max-height: calc(100vh - 160px);
-    }
-
-    .panel-project {
-      padding: 12px;
-      margin-bottom: 12px;
-      background: #f6f6f6;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .panel-project-title {
-      font-weight: 800;
-      font-size: 14px;
-      margin: 0 0 6px 0;
-      color: #111;
-    }
-
-    .panel-row {
-      font-size: 13px;
-      color: #111;
-      margin: 2px 0;
-    }
-
-    .panel-row strong { font-weight: 700; }
-
-    .theme-chips {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .theme-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.06);
-      border: 1px solid rgba(0,0,0,0.12);
-      font-size: 12px;
-      color: #111;
-      white-space: nowrap;
-    }
-
-    .theme-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      display: inline-block;
-      border: 1px solid rgba(255,255,255,0.35);
-    }
-
-    .panel-hint {
-      font-size: 12px;
-      opacity: 0.7;
-      margin-top: 6px;
-    }
-
-    /* Mobile: turn panel into bottom sheet */
-    @media (max-width: 640px) {
-      #infoPanel {
-        left: 14px;
-        right: 14px;
-        width: auto;
-        top: auto;
-        bottom: 14px;
-        max-height: 55vh;
-      }
-      #infoPanelBody {
-        max-height: calc(55vh - 60px);
-      }
-    }
+  }
   </style>
+
 </head>
 
 <body>
@@ -217,7 +251,6 @@
           <div id="infoPanelTitle">Projects</div>
           <div id="infoPanelMeta"></div>
         </div>
-        <button id="closePanelBtn" type="button">Close</button>
       </div>
       <div id="infoPanelBody"></div>
     </div>
@@ -228,7 +261,6 @@
 
   <script>
     window.addEventListener("load", () => {
-
       /* =========================
          PROJECT DATA
          ========================= */
@@ -239,7 +271,7 @@
           projects: [
             {
               project: "Evidence for accountability: Remote sensing to protect the environment from harms",
-              themes: ["Nature & Biodiversity"],
+              themes: ["Nature and Biodiversity"],
               pilot_status: "Live"
             },
             {
@@ -253,6 +285,68 @@
               pilot_status: "Closed"
             }
           ]
+        },
+        {
+          iso_a3: "BRA",
+          country: "Brazil",
+          projects: [
+            {
+              project: "Stop the spread: Using drones and nano-bio gel to prevent wildfires",
+              themes: ["Nature and Biodiversity"],
+              pilot_status: "Live"
+            }
+          ]
+        },
+        {
+          iso_a3: "KEN",
+          country: "Kenya",
+          projects: [
+            {
+              project: "Data for matchmaking: Connecting start-ups and funders",
+              themes: ["Sustainable Economic Development"],
+              pilot_status: "Live"
+            },
+            {
+              project: "Smart mobility: using assistive tech and digital mapping to promote urban accessibility",
+              themes: ["Infrastructure and Energy"],
+              pilot_status: "Live"
+            },
+            {
+              project: "Solar Home electrolyser proof of concept",
+              themes: ["Infrastructure and Energy"],
+              pilot_status: "Closed"
+            },
+            {
+              project: "Low-cost sensors for optimal insect protein production",
+              themes: ["Agriculture and Food Security"],
+              pilot_status: "Closed"
+            },
+            {
+              project: "Portable Benefits and Protections Platform",
+              themes: ["Other"],
+              pilot_status: "Closed"
+            },
+            {
+              project: "Kijenzi - Manufacturing for the next frontier",
+              themes: ["Sustainable Economic Development"],
+              pilot_status: "Closed"
+            },
+            {
+              project: "Smart Contraceptive Vending Machines",
+              themes: ["Global Health"],
+              pilot_status: "Closed"
+            },
+            {
+              project: "EVs and Mini-Grids",
+              themes: ["Infrastructure and Energy"],
+              pilot_status: "Closed"
+            },
+            {
+              project: "Monitoring biodiversity with frontier sensing technologies",
+              themes: ["Nature and Biodiversity"],
+              pilot_status: "Closed"
+            }
+          ]
         }
       ];
 
@@ -262,16 +356,14 @@
 
       /* =========================
          THEME COLOURS
-         (Add yours here)
          ========================= */
       const themeColors = {
         "Nature & Biodiversity": "#2f9e44",
         "Humanitarian": "#f08c00",
-
-        // your older examples (keep if needed)
-        "Student assessment": "#ff4d6d",
-        "Accurate data": "#4dabf7",
-        "Accessible information": "#51cf66"
+        "Sustainable Economic Development": "#51cf66",
+        "Infrastructure and Energy": "#4dabf7",
+        "Global Health": "#ff4d6d",
+        "Other": "#ccc"
       };
 
       const defaultColor = "#ffffff";
@@ -326,6 +418,57 @@
       }).setView([15, 15], 2);
 
       map.zoomControl.setPosition("topright");
+
+      const hoverPopup = L.popup({
+        autoPan: true,
+        closeButton: false,
+        className: "project-popup"
+      });
+
+      function buildPopupHTML(countryProjects) {
+        const selectedTheme = themeSelect.value;
+
+        const filtered = countryProjects.projects.filter(proj =>
+          selectedTheme === "__ALL__" || (proj.themes || []).includes(selectedTheme)
+        );
+
+        if (filtered.length === 0) return "";
+
+        const displayed = filtered.slice(0, 3);
+        const extra = filtered.slice(3);
+
+        return `
+          <div class="popup-wrap">
+            <div class="popup-header">
+              <div class="popup-title">${countryProjects.country}</div>
+              <div class="popup-meta">${filtered.length} project${filtered.length === 1 ? "" : "s"}</div>
+            </div>
+
+            <div class="popup-body">
+              ${displayed.map(proj => `
+                <div class="panel-project">
+                  <div class="panel-project-title">${proj.project}</div>
+                  <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
+                  ${renderThemeChips(proj.themes)}
+                </div>
+              `).join("")}
+
+              ${extra.length > 0 ? `
+                <div class="panel-hint">Scroll for more projects.</div>
+                <div class="scrollable-projects">
+                  ${extra.map(proj => `
+                    <div class="panel-project">
+                      <div class="panel-project-title">${proj.project}</div>
+                      <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
+                      ${renderThemeChips(proj.themes)}
+                    </div>
+                  `).join("")}
+                </div>
+              ` : ""}
+            </div>
+          </div>
+        `;
+      }
 
       /* =========================
          HELPERS
@@ -396,29 +539,45 @@
       const infoPanelTitle = document.getElementById("infoPanelTitle");
       const infoPanelMeta = document.getElementById("infoPanelMeta");
       const infoPanelBody = document.getElementById("infoPanelBody");
-      const closePanelBtn = document.getElementById("closePanelBtn");
 
-      function openPanel(countryProjects) {
+      function openPanel(countryProjects, latlng) {
+        if (!countryProjects.projects || countryProjects.projects.length === 0) {
+          closePanel();
+          return;
+        }
+
         infoPanelTitle.textContent = countryProjects.country;
         infoPanelMeta.textContent = `${countryProjects.projects.length} project${countryProjects.projects.length === 1 ? "" : "s"}`;
 
-        infoPanelBody.innerHTML = countryProjects.projects.map((proj) => {
-          return `
+        const filteredProjects = countryProjects.projects.filter(proj =>
+          themeSelect.value === "__ALL__" || proj.themes.includes(themeSelect.value)
+        );
+
+        const displayedProjects = filteredProjects.slice(0, 3);
+        const extraProjects = filteredProjects.slice(3);
+
+        infoPanelBody.innerHTML = `
+          ${displayedProjects.map(proj => `
             <div class="panel-project">
               <div class="panel-project-title">${proj.project}</div>
               <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
               ${renderThemeChips(proj.themes)}
             </div>
-          `;
-        }).join("");
+          `).join("")}
 
-        // Optional hint if there are many projects
-        if (countryProjects.projects.length > 3) {
-          infoPanelBody.insertAdjacentHTML(
-            "beforeend",
-            `<div class="panel-hint">Scroll for more projects.</div>`
-          );
-        }
+          ${extraProjects.length > 0 ? `
+            <div class="panel-hint">Scroll for more projects.</div>
+            <div class="scrollable-projects">
+              ${extraProjects.map(proj => `
+                <div class="panel-project">
+                  <div class="panel-project-title">${proj.project}</div>
+                  <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
+                  ${renderThemeChips(proj.themes)}
+                </div>
+              `).join("")}
+            </div>
+          ` : ''}
+        `;
 
         infoPanel.style.display = "block";
       }
@@ -429,18 +588,6 @@
         infoPanelMeta.textContent = "";
         infoPanelBody.innerHTML = "";
       }
-
-      closePanelBtn.addEventListener("click", closePanel);
-
-      // Close panel if user clicks on empty map area
-      map.on("click", (e) => {
-        // If they clicked the map (not a country layer), close
-        // Leaflet sets originalEvent target; country clicks are handled separately.
-        // This is a light heuristic; remove if you want panel to persist.
-        if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.id === "map") {
-          closePanel();
-        }
-      });
 
       /* =========================
          LOAD GEOJSON + INTERACTION
@@ -469,27 +616,31 @@
             const countryProjects = projectByIso.get(iso);
             if (!countryProjects) return;
 
-            layer.on("mouseover", () => {
-              layer.setStyle({
-                weight: 1.8,
-                opacity: 1,
-                fillColor: currentThemeColor(),
-                fillOpacity: 0.7
-              });
+            layer.on("mouseover", (e) => {
+              const countryProjects = projectByIso.get(getIsoFromFeature(e.target.feature));
+              if (!countryProjects) return;
+
+              const html = buildPopupHTML(countryProjects);
+              if (!html) return;
+
+              hoverPopup
+                .setLatLng(e.latlng)
+                .setContent(html)
+                .openOn(map);
             });
 
-            layer.on("mouseout", () => {
-              geoLayer.resetStyle(layer);
+            layer.on("mouseout", (e) => {
+              const related = e && e.originalEvent && e.originalEvent.relatedTarget;
+              if (related && related.closest && related.closest('.project-popup')) {
+                return;
+              }
+              map.closePopup(hoverPopup);
             });
 
-            // Click opens the side panel (reliable for lots of content)
-            layer.on("click", () => {
-              openPanel(countryProjects);
-            });
+            map.on('click', () => map.closePopup(hoverPopup));
           }
         }).addTo(map);
 
-        // Fit bounds to your project countries
         const bounds = [];
         geoLayer.eachLayer(l => {
           const iso = getIsoFromFeature(l.feature);
@@ -502,12 +653,44 @@
         }
       }
 
+      // Stop wheel/touch from bubbling to the map so the popup body can scroll
+      map.on('popupopen', (e) => {
+        const el = e.popup.getElement && e.popup.getElement();
+        const content = el && el.querySelector('.popup-body');
+        if (!content) return;
+
+        const stop = (ev) => ev.stopPropagation();
+
+        content.addEventListener('wheel', stop, { passive: false });
+        content.addEventListener('touchstart', stop, { passive: false });
+        content.addEventListener('touchmove', stop, { passive: false });
+
+        const disableDragging = () => map.dragging.disable();
+        const enableDragging = () => map.dragging.enable();
+
+        content.addEventListener('mouseenter', disableDragging);
+        content.addEventListener('mouseleave', enableDragging);
+        content.addEventListener('touchstart', disableDragging, { passive: false });
+        content.addEventListener('touchend', enableDragging, { passive: false });
+
+        e.popup._cleanupScroll = () => {
+          content.removeEventListener('wheel', stop);
+          content.removeEventListener('touchstart', stop);
+          content.removeEventListener('touchmove', stop);
+          content.removeEventListener('mouseenter', disableDragging);
+          content.removeEventListener('mouseleave', enableDragging);
+          content.removeEventListener('touchstart', disableDragging);
+          content.removeEventListener('touchend', enableDragging);
+        };
+      });
+
+      map.on('popupclose', (e) => {
+        if (e.popup && e.popup._cleanupScroll) e.popup._cleanupScroll();
+      });
+
       themeSelect.addEventListener("change", () => {
         updateThemeDot();
         if (geoLayer) geoLayer.setStyle(regionStyle);
-
-        // If panel is open, you might want to keep it as-is;
-        // this just updates the highlight behaviour on the map.
       });
 
       init();
