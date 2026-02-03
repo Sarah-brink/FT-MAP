@@ -48,6 +48,45 @@
     font-size: 14px;
   }
 
+  /* Toggle Switch */
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .toggle-group label {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .toggle-switch {
+    display: inline-flex;
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 2px;
+    gap: 0;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .toggle-option {
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    transition: all 0.2s ease;
+    border-radius: 18px;
+  }
+
+  .toggle-option.active {
+    background: #1A807D;
+    color: #ffffff;
+  }
+
   #themeDot {
     width: 10px;
     height: 10px;
@@ -275,6 +314,13 @@
       <label for="themeSelect">Explore by theme</label>
       <span id="themeDot" aria-hidden="true"></span>
       <select id="themeSelect"></select>
+      <div class="toggle-group">
+        <label>Status:</label>
+        <div class="toggle-switch">
+          <button class="toggle-option active" data-status="live">Live</button>
+          <button class="toggle-option" data-status="all">All</button>
+        </div>
+      </div>
     </div>
 
     <div id="map"></div>
@@ -416,6 +462,19 @@
       const themeSelect = document.getElementById("themeSelect");
       const themeDot = document.getElementById("themeDot");
 
+      // Status toggle
+      let statusFilter = "live"; // "live" or "all"
+      const toggleButtons = document.querySelectorAll(".toggle-option");
+      toggleButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          toggleButtons.forEach(b => b.classList.remove("active"));
+          e.target.classList.add("active");
+          statusFilter = e.target.dataset.status;
+          if (geoLayer) geoLayer.setStyle(regionStyle);
+          updateThemeDot();
+        });
+      });
+
       themeSelect.innerHTML = "";
 
       const allOpt = document.createElement("option");
@@ -466,9 +525,11 @@
       function buildPopupHTML(countryProjects) {
         const selectedTheme = themeSelect.value;
 
-        const filtered = countryProjects.projects.filter(proj =>
-          selectedTheme === "__ALL__" || (proj.themes || []).includes(selectedTheme)
-        );
+        const filtered = countryProjects.projects.filter(proj => {
+          const themeMatch = selectedTheme === "__ALL__" || (proj.themes || []).includes(selectedTheme);
+          const statusMatch = statusFilter === "all" || proj.pilot_status === "Live";
+          return themeMatch && statusMatch;
+        });
 
         if (filtered.length === 0) return "";
 
@@ -589,9 +650,11 @@
         infoPanelTitle.textContent = countryProjects.country;
         infoPanelMeta.textContent = `${countryProjects.projects.length} project${countryProjects.projects.length === 1 ? "" : "s"}`;
 
-        const filteredProjects = countryProjects.projects.filter(proj =>
-          themeSelect.value === "__ALL__" || proj.themes.includes(themeSelect.value)
-        );
+        const filteredProjects = countryProjects.projects.filter(proj => {
+          const themeMatch = themeSelect.value === "__ALL__" || proj.themes.includes(themeSelect.value);
+          const statusMatch = statusFilter === "all" || proj.pilot_status === "Live";
+          return themeMatch && statusMatch;
+        });
 
         const displayedProjects = filteredProjects.slice(0, 3);
         const extraProjects = filteredProjects.slice(3);
