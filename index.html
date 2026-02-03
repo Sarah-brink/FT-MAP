@@ -490,7 +490,7 @@
 
       const allOpt = document.createElement("option");
       allOpt.value = "__ALL__";
-      allOpt.textContent = "All pilots";
+      allOpt.textContent = "All projects";
       themeSelect.appendChild(allOpt);
 
       for (const t of themes) {
@@ -524,7 +524,7 @@
           totalCount += filtered.length;
         });
         
-        projectCountEl.textContent = `${totalCount} project${totalCount === 1 ? "" : "s"}`;
+        projectCountEl.textContent = `${totalCount} Pilot${totalCount === 1 ? "" : "s"}`;
       }
 
       updateThemeDot();
@@ -568,7 +568,7 @@
           <div class="popup-wrap">
             <div class="popup-header">
               <div class="popup-title">${countryProjects.country}</div>
-              <div class="popup-meta">${filtered.length} project${filtered.length === 1 ? "" : "s"}</div>
+              <div class="popup-meta">${filtered.length} Pilot${filtered.length === 1 ? "" : "s"}</div>
             </div>
 
             <div class="popup-body">
@@ -582,7 +582,7 @@
               `).join("")}
 
               ${extra.length > 0 ? `
-                <div class="panel-hint">Scroll for more pilots.</div>
+                <div class="panel-hint">Scroll for more Pilots.</div>
                 <div class="scrollable-projects">
                   ${extra.map(proj => `
                     <div class="panel-project">
@@ -676,7 +676,7 @@
         }
 
         infoPanelTitle.textContent = countryProjects.country;
-        infoPanelMeta.textContent = `${countryProjects.projects.length} project${countryProjects.projects.length === 1 ? "" : "s"}`;
+        infoPanelMeta.textContent = `${countryProjects.projects.length} Pilot${countryProjects.projects.length === 1 ? "" : "s"}`;
 
         const filteredProjects = countryProjects.projects.filter(proj => {
           const themeMatch = themeSelect.value === "__ALL__" || proj.themes.includes(themeSelect.value);
@@ -698,7 +698,7 @@
           `).join("")}
 
           ${extraProjects.length > 0 ? `
-            <div class="panel-hint">Scroll for more pilots.</div>
+            <div class="panel-hint">Scroll for more Pilots.</div>
             <div class="scrollable-projects">
               ${extraProjects.map(proj => `
                 <div class="panel-project">
@@ -717,7 +717,7 @@
 
       function closePanel() {
         infoPanel.style.display = "none";
-        infoPanelTitle.textContent = "Pilots";
+        infoPanelTitle.textContent = "Projects";
         infoPanelMeta.textContent = "";
         infoPanelBody.innerHTML = "";
       }
