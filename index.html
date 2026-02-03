@@ -39,6 +39,14 @@
     opacity: 0.85;
   }
 
+  #projectCount {
+    font-size: 13px;
+    color: #ffffff;
+    opacity: 0.75;
+    margin-left: auto;
+    padding-right: 10px;
+  }
+
   #themeSelect {
     background: #111;
     color: #fff;
@@ -321,6 +329,7 @@
           <button class="toggle-option" data-status="all">All</button>
         </div>
       </div>
+      <div id="projectCount"></div>
     </div>
 
     <div id="map"></div>
@@ -461,6 +470,7 @@
 
       const themeSelect = document.getElementById("themeSelect");
       const themeDot = document.getElementById("themeDot");
+      const projectCountEl = document.getElementById("projectCount");
 
       // Status toggle
       let statusFilter = "live"; // "live" or "all"
@@ -472,6 +482,7 @@
           statusFilter = e.target.dataset.status;
           if (geoLayer) geoLayer.setStyle(regionStyle);
           updateThemeDot();
+          updateProjectCount();
         });
       });
 
@@ -500,7 +511,24 @@
         themeDot.style.background = currentThemeColor();
       }
 
+      function updateProjectCount() {
+        if (!projectCountEl) return;
+        let totalCount = 0;
+        
+        projects.forEach(countryProjects => {
+          const filtered = countryProjects.projects.filter(proj => {
+            const themeMatch = themeSelect.value === "__ALL__" || proj.themes.includes(themeSelect.value);
+            const statusMatch = statusFilter === "all" || proj.pilot_status === "Live";
+            return themeMatch && statusMatch;
+          });
+          totalCount += filtered.length;
+        });
+        
+        projectCountEl.textContent = `${totalCount} project${totalCount === 1 ? "" : "s"}`;
+      }
+
       updateThemeDot();
+      updateProjectCount();
 
       /* =========================
          MAP SETUP (NO BASEMAP)
@@ -554,7 +582,7 @@
               `).join("")}
 
               ${extra.length > 0 ? `
-                <div class="panel-hint">Scroll for more projects.</div>
+                <div class="panel-hint">Scroll for more pilots.</div>
                 <div class="scrollable-projects">
                   ${extra.map(proj => `
                     <div class="panel-project">
@@ -670,7 +698,7 @@
           `).join("")}
 
           ${extraProjects.length > 0 ? `
-            <div class="panel-hint">Scroll for more projects.</div>
+            <div class="panel-hint">Scroll for more pilots.</div>
             <div class="scrollable-projects">
               ${extraProjects.map(proj => `
                 <div class="panel-project">
@@ -689,7 +717,7 @@
 
       function closePanel() {
         infoPanel.style.display = "none";
-        infoPanelTitle.textContent = "Projects";
+        infoPanelTitle.textContent = "Pilots";
         infoPanelMeta.textContent = "";
         infoPanelBody.innerHTML = "";
       }
@@ -795,6 +823,7 @@
 
       themeSelect.addEventListener("change", () => {
         updateThemeDot();
+        updateProjectCount();
         if (geoLayer) geoLayer.setStyle(regionStyle);
       });
 
