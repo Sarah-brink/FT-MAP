@@ -234,6 +234,26 @@
     padding-top: 10px;
   }
 
+  .project-button {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 16px;
+    background: #ffffff;
+    color: ##1A807D;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #1A807D;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .project-button:hover {
+    background: #156460;
+    color: #ffffff;
+  }
+
   /* Mobile: turn panel into bottom sheet */
   @media (max-width: 640px) {
     #infoPanel {
@@ -319,7 +339,8 @@
             {
               project: "Data for matchmaking: Connecting start-ups and funders",
               themes: ["Sustainable Economic Development"],
-              pilot_status: "Live"
+              pilot_status: "Live",
+              url: "https://www.frontiertechhub.org/pilot-portfolio/unlocking-innovation"
             },
             {
               project: "Smart mobility: using assistive tech and digital mapping to promote urban accessibility",
@@ -467,6 +488,7 @@
                   <div class="panel-project-title">${proj.project}</div>
                   <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
                   ${renderThemeChips(proj.themes)}
+                  ${proj.url ? `<a href="${proj.url}" class="project-button" target="_blank">Learn more</a>` : ""}
                 </div>
               `).join("")}
 
@@ -478,6 +500,7 @@
                       <div class="panel-project-title">${proj.project}</div>
                       <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
                       ${renderThemeChips(proj.themes)}
+                      ${proj.url ? `<a href="${proj.url}" class="project-button" target="_blank">Learn more</a>` : ""}
                     </div>
                   `).join("")}
                 </div>
@@ -579,6 +602,7 @@
               <div class="panel-project-title">${proj.project}</div>
               <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
               ${renderThemeChips(proj.themes)}
+              ${proj.url ? `<a href="${proj.url}" class="project-button" target="_blank">Learn more</a>` : ""}
             </div>
           `).join("")}
 
@@ -590,6 +614,7 @@
                   <div class="panel-project-title">${proj.project}</div>
                   <div class="panel-row"><strong>Pilot Status:</strong> ${proj.pilot_status || "-"}</div>
                   ${renderThemeChips(proj.themes)}
+                  ${proj.url ? `<a href="${proj.url}" class="project-button" target="_blank">Learn more</a>` : ""}
                 </div>
               `).join("")}
             </div>
